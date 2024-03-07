@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt \
     && python --version
 
 COPY main.py /code/main.py
-CMD [ "uvicorn","main:app","--host" ,"0.0.0.0","--port","80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
