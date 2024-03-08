@@ -1,34 +1,25 @@
-from fastapi import FastAPI,File, UploadFile, Form
-import os
+from fastapi import FastAPI, File, Form, UploadFile
 import boto3
-from dotenv import load_dotenv, find_dotenv
 from botocore.exceptions import NoCredentialsError
 
-load_dotenv()
-
 app = FastAPI()
+
 @app.get("/")
 def homepage():
     return "You Have Reached Home Page of the FastAPI Application"
 
 @app.get("/getvpc")
-def get_vpc_list(region):
+def get_vpc_list(region: str):
     ec2 = boto3.client('ec2', region_name=region)
     response = ec2.describe_vpcs()
-    vpc_id_list = []
-    for vpc in response['Vpcs']:  # Corrected the key here
-        vpc_id_list.append(vpc['VpcId'])
-    print(vpc_id_list)
+    vpc_id_list = [vpc['VpcId'] for vpc in response['Vpcs']]
     return vpc_id_list
 
 @app.get("/s3")
-def get_s3_buckets(region):
+def get_s3_buckets(region: str):
     s3 = boto3.client('s3', region_name=region)
     response = s3.list_buckets()
-    bucket_list = []
-    for bucket in response['Buckets']:
-        bucket_list.append(bucket['Name'])
-    print(bucket_list)
+    bucket_list = [bucket['Name'] for bucket in response['Buckets']]
     return bucket_list
 
 def upload_file_to_s3(file_name, bucket_name, object_name=None, location="us-east-1"):
@@ -56,7 +47,7 @@ def upload_file_to_s3(file_name, bucket_name, object_name=None, location="us-eas
 async def upload_to_s3(bucket_name: str = Form(...), location: str = Form("us-east-1"), file: UploadFile = File(...)):
     file_location = f"/tmp/{file.filename}"
     with open(file_location, "wb+") as file_object:
-        file_object.write(file.file.read())
+        file_object.write(await file.read())
     success = upload_file_to_s3(file_location, bucket_name, file.filename, location)
     if success:
         return {"message": "File uploaded successfully"}
