@@ -13,6 +13,6 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt \
 
 COPY main.py /code/main.py
 ADD Dockerfile.info instructions.txt
-ADD https://releases.hashicorp.com/terraform/{T_VERSION}/terraform_{T_VERSION}_linux_amd64.zip terraform.zip
+ADD https://releases.hashicorp.com/terraform/${T_VERSION}/terraform_${T_VERSION}_linux_amd64.zip terraform.zip
 RUN unzip terraform.zip -d /usr/local/bin
 CMD [ "uvicorn","main:app","--host" ,"0.0.0.0","--port","80"]
